@@ -13,6 +13,11 @@ import android.os.Build;
 import android.support.v4.app.NotificationManagerCompat;
 import android.util.Log;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Random;
@@ -37,8 +42,10 @@ public class Receiver extends BroadcastReceiver {
             notificationManager.createNotificationChannel(channel);
             builder.setChannelId("InevitableChannel");
         }
-        builder.setContentTitle("Remember");
-        builder.setContentText("Everyone Dies Eventually");
+        builder.setContentTitle("Inevitable");
+        String quote = randomQuote(context);
+        Log.d("Notif", "" + quote);
+        builder.setContentText(quote);
         builder.setSmallIcon(R.mipmap.ic_launcher);
         Intent notifyIntent = new Intent(context, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 2, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -67,14 +74,38 @@ public class Receiver extends BroadcastReceiver {
         PendingIntent pi = PendingIntent.getBroadcast(context, 0, i, 0);
 
         Random r = new Random();
-        int ri = r.nextInt(24 - 1) + 1; // Random integer between 12 (inclusive) and 1 (exclusive),
+        int ri = r.nextInt(24 - 1) + 1; // Random integer between 24 (inclusive) and 1 (exclusive),
         //int delay = 1000 * 60 * 60 * ri; // Millisec * Second * Minute * hours
-        int delay = 1000 * 3600;
+        int delay = 1000 * 6;
 
         am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + delay, pi); //Delay
         Log.d("Notif", "Delay set to: " +delay/1000/60/60 + " Hours" );
         Log.d("Notif", "Milli: " + delay);
 
+    }
+
+    public String randomQuote(Context context) {
+        Log.d("Notif", "Random Quote");
+        ArrayList<String> stringList = new ArrayList<>();
+        BufferedReader bufferedReader = null;
+
+        try {
+            bufferedReader = new BufferedReader(new InputStreamReader(context.getAssets().open("quotes.txt")));
+
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+               stringList.add(line);
+               Log.d("Notif", "Line:" + line);
+            } bufferedReader.close();
+        } catch (IOException e) {
+            //Error handling
+            Log.d("Notif", "IOException");
+            Log.d("Notif", e.toString());
+        }
+
+        Random r = new Random();
+        int i = r.nextInt(stringList.size()-1) + 0;
+        return stringList.get(i);
     }
 
     public void cancelAlarm(Context context){
