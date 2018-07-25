@@ -30,19 +30,19 @@ public class Receiver extends BroadcastReceiver {
     private static final int NOTIFICATION_ID = 3;
     @Override
     public void onReceive(Context context, Intent intent) {
-
+        Log.d("Notif", "Receiver received intent");
         Notification.Builder builder = new Notification.Builder(context);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationManager notificationManager =
                     (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
             NotificationChannel channel = new NotificationChannel("InevitableChannel",
-                    "Channel name",
+                    "InevitableChannel",
                     NotificationManager.IMPORTANCE_LOW);
-            channel.setDescription("Channel description");
+            channel.setDescription("Notification Channel for Inevitable");
             notificationManager.createNotificationChannel(channel);
             builder.setChannelId("InevitableChannel");
         }
-        builder.setContentTitle("Inevitable");
+        builder.setContentTitle("Consider");
         String quote = randomQuote(context);
         Log.d("Notif", "" + quote);
         builder.setContentText(quote);
@@ -75,8 +75,8 @@ public class Receiver extends BroadcastReceiver {
 
         Random r = new Random();
         int ri = r.nextInt(24 - 1) + 1; // Random integer between 24 (inclusive) and 1 (exclusive),
-        //int delay = 1000 * 60 * 60 * ri; // Millisec * Second * Minute * hours
-        int delay = 1000 * 6;
+        int delay = 1000 * 60 * 60 * ri; // Millisec * Second * Minute * hours
+        //int delay = 1000 * 6;
 
         am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + delay, pi); //Delay
         Log.d("Notif", "Delay set to: " +delay/1000/60/60 + " Hours" );
